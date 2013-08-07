@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Inserts plupload file upload elements into Islandora forms.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_plupload_menu() {
+  $items = array();
+  $items['admin/islandora/plupload'] = array(
+    'title' => 'Plupload',
+    'access arguments' => array('administer islandora plupload'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_plupload_admin_form'),
+    'file' => 'includes/admin.form.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function islandora_plupload_permission() {
+  return array(
+    'administer islandora plupload' => array(
+      'title' => t('Administer Islandora Plupload'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function islandora_plupload_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'islandora') !== FALSE) {
+    $islandora_plupload_max = variable_get('islandora_plupload_max_filesize', 3000);
+    foreach ($form as &$element) {
+      if (isset($element['#type']) && $element['#type'] === 'managed_file') {
+        $element['#type'] = 'plupload';
+        unset($element['#description']);
+        $element['#upload_validators']['file_validate_size'] = array($islandora_plupload_max * 1024 * 1024);
+        $settings = array(
+          'max_file_size' => $islandora_plupload_max . 'MB',
+          'chunk_size' => variable_get('islandora_plupload_chunk_size', 15) . 'MB',
+        );
+        $element['#plupload_settings'] = $settings;
+      }
+    }
+
+    $form['#validate'][] = 'islandora_plupload_form_validate';
+  }
+}
+
+/**
+ * Validation of the form_alter. Used to get files in place before _submit().
+ */
+function islandora_plupload_form_validate(&$form, &$form_state) {
+  module_load_include('inc', 'islandora', 'includes/mime_detect');
+  foreach ($form_state['complete form'] as $name => $element) {
+    if (isset($element['#type']) && $element['#type'] == 'plupload' && is_array($form_state['values'][$name][0])) {
+      $file = plupload_file_uri_to_object($form_state['values'][$name][0]["tmppath"]);
+      $file->filename = $form_state['values'][$name][0]['name'];
+      $mime_detect = new MimeDetect();
+      $file->filemime = $mime_detect->getMimeType($file->filename);
+      islandora_plupload_file_save($file);
+      $form_state['values'][$name] = $file->fid;
+    }
+  }
+}
+
+/**
+ * Copy of Drupal file_save that buries errors using filesize() on files > 2GB.
+ */
+function islandora_plupload_file_save($file) {
+  $file->timestamp = REQUEST_TIME;
+  if (!isset($file->filesize)) {
+    $file->filesize = @filesize($file->uri);
+  }
+  module_invoke_all('file_presave', $file);
+  module_invoke_all('entity_presave', $file, 'file');
+
+  if (empty($file->fid)) {
+    drupal_write_record('file_managed', $file);
+    // Inform modules about the newly added file.
+    module_invoke_all('file_insert', $file);
+    module_invoke_all('entity_insert', $file, 'file');
+  }
+
+  unset($file->original);
+  return $file;
+}
