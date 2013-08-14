@@ -48,6 +48,7 @@ function islandora_plupload_form_alter(&$form, &$form_state, $form_id) {
           'chunk_size' => variable_get('islandora_plupload_chunk_size', 15) . 'MB',
         );
         $element['#plupload_settings'] = $settings;
+        $element['#submit_element'] = '#edit-next';
       }
     }
 
