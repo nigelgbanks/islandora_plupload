@@ -33,12 +33,31 @@ function islandora_plupload_permission() {
 }
 
 /**
+ * Implements hook_element_info_alter().
+ */
+function islandora_plupload_element_info_alter(&$type) {
+  if (isset($type['plupload'])) {
+    $type['plupload']['#upload_required'] = FALSE;
+    $type['plupload']['#process'][] = 'islandora_plupload_element_process';
+  }
+}
+
+/**
  * Implements hook_form_alter().
  */
 function islandora_plupload_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'islandora') !== FALSE) {
     islandora_plupload_alter_managed_files($form);
   }
+}
+
+/**
+ * Implements hook_element_process().
+ */
+function islandora_plupload_element_process(array $element, array &$form_state, array $complete_form = NULL) {
+  $element['#upload_required'] = $element['#required'];
+  $element['#required'] = FALSE;
+  return $element;
 }
 
 /**
@@ -100,6 +119,9 @@ function islandora_plupload_element_validate($element, &$form_state) {
   }
   elseif (isset($element['#type']) && $element['#type'] == 'plupload' && !is_numeric($form_state['values'][$element['#name']])) {
     $form_state['values'][$element['#name']] = 0;
+    if ($element['#upload_required']) {
+      form_error($element, t('!name field is required.', array('!name' => $element['#title'])));
+    }
   }
 }
 
