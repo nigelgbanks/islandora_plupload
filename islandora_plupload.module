@@ -33,31 +33,12 @@ function islandora_plupload_permission() {
 }
 
 /**
- * Implements hook_element_info_alter().
- */
-function islandora_plupload_element_info_alter(&$type) {
-  if (isset($type['plupload'])) {
-    $type['plupload']['#upload_required'] = FALSE;
-    $type['plupload']['#process'][] = 'islandora_plupload_element_process';
-  }
-}
-
-/**
  * Implements hook_form_alter().
  */
 function islandora_plupload_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'islandora') !== FALSE) {
     islandora_plupload_alter_managed_files($form);
   }
-}
-
-/**
- * Implements hook_element_process().
- */
-function islandora_plupload_element_process(array $element, array &$form_state, array $complete_form = NULL) {
-  $element['#upload_required'] = $element['#required'];
-  $element['#required'] = FALSE;
-  return $element;
 }
 
 /**
@@ -81,6 +62,8 @@ function islandora_plupload_alter_managed_files(&$form) {
       }
       if (isset($element['#type']) && $element['#type'] === 'managed_file') {
         $element['#type'] = 'plupload';
+        $element['#upload_required'] = isset($element['#required']) ? $element['#required'] : FALSE;
+        $element['#required'] = FALSE;
         unset($element['#description']);
         $element['#upload_validators']['file_validate_size'] = array($islandora_plupload_max * 1024 * 1024);
         $settings = array(
