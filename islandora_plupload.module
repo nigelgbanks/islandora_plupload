@@ -62,6 +62,15 @@ function islandora_plupload_alter_managed_files(&$form) {
       }
       if (isset($element['#type']) && $element['#type'] === 'managed_file') {
         $element['#type'] = 'plupload';
+        // Element value validation is hard-coded to occur in form.inc
+        // function _form_validate() before the elements own validation hooks
+        // are run. We must ignore the #required property of plupload elements,
+        // and use our own #upload_required property. So that we can validate
+        // the unconventinal values used for submitted plupload elements in our
+        // own element validation handler rather than the one provided by
+        // Drupal.
+        $element['#upload_required'] = isset($element['#required']) ? $element['#required'] : FALSE;
+        $element['#required'] = FALSE;
         unset($element['#description']);
         $element['#upload_validators']['file_validate_size'] = array($islandora_plupload_max * 1024 * 1024);
         $settings = array(
@@ -100,6 +109,9 @@ function islandora_plupload_element_validate($element, &$form_state) {
   }
   elseif (isset($element['#type']) && $element['#type'] == 'plupload' && !is_numeric($form_state['values'][$element['#name']])) {
     $form_state['values'][$element['#name']] = 0;
+    if ($element['#upload_required']) {
+      form_error($element, t('@name field is required.', array('@name' => $element['#title'])));
+    }
   }
 }
 
