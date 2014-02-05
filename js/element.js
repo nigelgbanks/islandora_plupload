@@ -22,16 +22,12 @@
               $('.plupload_add', element).hide('slow');
             }
           });
-
           uploader.bind('FilesRemoved', function(up, files) {
             if (up.files.length < maxFiles) {
               $('.plupload_add', element).show('slow');
             }
           });
-
-          var total_upload_files = 0;             
           uploader.bind('FileUploaded', function(up, file, res) {
-            total_upload_files--;
             if (uploader.total.uploaded == uploader.files.length) {
               if ($('form[class="plupload-form-processed"]').size() > 0) {
                 setTimeout(function() {
@@ -39,9 +35,6 @@
                 }, 550);
               }
             }
-          });
-          uploader.bind('QueueChanged', function(up, files) {
-            total_upload_files = uploader.files.length;
           });
         }
       });
