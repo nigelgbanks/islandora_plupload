@@ -29,7 +29,7 @@
           });
           uploader.bind('FileUploaded', function(up, file, res) {
             if (uploader.total.uploaded == uploader.files.length) {
-              if ($('form[class="plupload-form-processed"]').size() > 0) {
+              if ($($element>'form[class="plupload-form-processed"]').size() > 0) {
                 setTimeout(function() {
                   $('form[class="plupload-form-processed"]').first().submit();
                 }, 550);
