@@ -10,7 +10,7 @@
  */
 function islandora_plupload_menu() {
   $items = array();
-  $items['admin/islandora/plupload'] = array(
+  $items['admin/islandora/tools/plupload'] = array(
     'title' => 'Plupload',
     'access arguments' => array('administer islandora plupload'),
     'page callback' => 'drupal_get_form',

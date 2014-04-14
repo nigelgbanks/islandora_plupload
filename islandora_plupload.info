@@ -3,4 +3,4 @@ description = Integrate Plupload for Islandora file upload chunking and resumpti
 core = 7.x
 dependencies[] = islandora
 dependencies[] = plupload
-package = Islandora
+package = Islandora Tools
