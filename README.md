@@ -32,7 +32,7 @@ will be replaced by the Plupload widget.
 CONFIGURATION
 -------------
 
-Visit /admin/islandora/plupload to set the maximum file size for Islandora Plupload.
+Visit /admin/islandora/tools/plupload to set the maximum file size for Islandora Plupload.
 The chunk size may also be set, this should be smaller than PHP's post_max_size.
 
 TROUBLESHOOTING
