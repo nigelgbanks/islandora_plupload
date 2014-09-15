@@ -54,7 +54,7 @@ function islandora_plupload_alter_managed_files(&$form) {
     foreach ($children as $element_key) {
       $element =& $form[$element_key];
       islandora_plupload_alter_managed_files($element);
-      if (isset($element['#type']) && $element['#type'] === 'managed_file') {
+      if (isset($element['#type']) && $element['#type'] === 'managed_file' && !(isset($element['#islandora_plupload_do_not_alter']) && $element['#islandora_plupload_do_not_alter'])) {
         $element['#type'] = 'plupload';
         // Element value validation is hard-coded to occur in form.inc
         // function _form_validate() before the elements own validation hooks
