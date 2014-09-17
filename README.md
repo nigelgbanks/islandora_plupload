@@ -39,3 +39,5 @@ TROUBLESHOOTING
 ---------------
 
 Handling of large files for derivative generation may require boosting PHP's memory_limit and max_execution_time.
+
+If you wish to avoid having this module alter a `managed_file` field, you may put the `#islandora_plupload_do_not_alter` flag on the given element (with a value which evaluates to `TRUE`).
