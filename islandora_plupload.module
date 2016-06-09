@@ -70,7 +70,7 @@ function islandora_plupload_alter_managed_files(&$form) {
         $settings = array(
           'max_file_size' => $islandora_plupload_max . 'MB',
           'chunk_size' => variable_get('islandora_plupload_chunk_size', 15) . 'MB',
-          'max_file_count' => 1,
+          'max_file_count' => isset($element['#max_file_count']) ? $element['#max_file_count'] : 1,
         );
         $element['#plupload_settings'] = $settings;
         $element['#submit_element'] = '#edit-next';
